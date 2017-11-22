@@ -117,23 +117,33 @@ type vulnerability = Low | Normal | High
   |  High vulnerability    hobbit:necrotic, human:fire, orc:angelic
   |  otherwise normal
   | *)
-(* let effectiveness (school : school) (race : race) : vulnerability =
-...
-*)
+let effectiveness (school : school) (race : race) : vulnerability =
+	match (race, school) with
+	| (Orc, Necrotic) | (Hobbit, Fire) | (Human, Angelic) -> Low
+	| (Hobbit, Necrotic) | (Human, Fire) | (Orc, Angelic) -> High
+	| (_, _) -> Normal
+
 
 (* Write a function that computes how vulnerable a wizard is to a spell *)
-let vulnerable = failwith "todo"
+let vulnerable (wizard : wizard) (spell : spell) : vulnerability =
+	effectiveness (school_of_spell spell) (wizard.race)
 
 
 (* Write a function that computes a damage coefficient. High vulnerability
   |  incurs double damage, low vulnerability half damage. *)
 
+let damage_coefficient (vul : vulnerability) : float =
+	match vul with
+	| Low -> 0.5
+	| High -> 2.0
+	| Normal -> 1.0
 
 (* Write a function that calculates how much damages a spell causes to a
   |  wizard, computed as the mana it uses times the vulnerability coefficient.
   |  Hint: float_of_int
 *)
-
+let damage (spell : spell) (wizard : wizard) : float =
+	(damage_coefficient (vulnerable wizard spell)) *. (float_of_int (mana_of_spell spell))
 
 (* Write a function that calculates the stats of a wizard after getting
   |  attacked by a particular spell.  *)
