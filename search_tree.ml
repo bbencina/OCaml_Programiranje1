@@ -164,9 +164,21 @@ let rec is_bst t =
    - : bool = false
    ---------- *)
 
-let rec insert x bst = ()
-
-let rec member x bst = ()
+let rec insert x bst =
+	match bst with
+	| Empty -> leaf x
+	| Node(t1, root, t2) -> if x = root
+		then bst
+		else if x < root
+		then Node(insert x t1, root, t2)
+		else Node(t1, root, insert x t2)
+	
+let rec member x bst =
+	match bst with
+	| Empty -> false
+	| Node(t1, root, t2) -> if x = root
+		then true
+		else (member x t1) || (member x t2)
 
 (* Write the function "member2", where you do not assume a BST structure.
    Think about the differences of time complexity for "member" and "member2"
@@ -181,7 +193,13 @@ let rec member2 x t = ()
    - : bool = true
    ---------- *)
 
-let bst_of_list l = ()
+let bst_of_list l =
+	let rec listing lst acc =
+		match (lst, acc) with
+		| ([], _) -> acc
+		| (hd::tl, Empty) -> listing tl (leaf hd)
+		| (hd::tl, Node(t1, x, t2)) -> listing tl (insert hd acc)
+	in listing l Empty
 
 (* Create a function "tree_sort l" ['a list -> 'a list] that sorts the list l
    by combining previously defining functions.
