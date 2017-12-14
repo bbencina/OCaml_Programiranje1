@@ -12,17 +12,11 @@ let pristej_tri = (+) 3
 
 (* 1.3) Definirajte funkcijo, ki vsem elementom seznama prišteje 5.
    Primer: /vsem_pristej_pet [1; 2] = [6; 7]/ *)
-let rec vsem_pristej_pet l =
-  match l with
-  | [] -> []
-  | hd::tl -> (hd + 5) :: (vsem_pristej_pet tl)
+let rec vsem_pristej_pet l = List.map ((+) 5) l
 
 (* 1.4) Definirajte funkcijo, ki vrne zadnjo komponento nabora s tremi elementi.
    Primer: /tretji (1, "horse", [None]) = [None]/ *)
-let tretji nabor =
-  match nabor with
-  | (y, z, x) -> x
-  | _ -> failwith "Nabor mora imeti natanko 3 elemente!"
+let tretji (y, z, x) = x
 
 (* 1.5) Definirajte funkcijo, ki vzame dve funkciji ter vrne njun kompozitum.
    Primer: /kompozitum succ string_of_int 5 = "6"/ *)
@@ -48,9 +42,7 @@ let koren = function
 (* 2.3) Napišite funkcijo, ki preveri, ali drevo celih števil vsebuje kakšno negativno število. *)
 let rec kaksno_negativno tree =
   match tree with
-  | Node(x, []) -> if x < 0
-    then true
-    else false
+  | Node(x, []) -> x < 0
   | Node(x, forest) -> if x < 0
     then true
     else
@@ -61,6 +53,10 @@ let rec kaksno_negativno tree =
         | hd::tl -> (kaksno_negativno hd) || (mapping tl)
       in mapping forest
       )
+let rec kaksno_negativno2 = function
+  | Node(x, forest) -> if x < 0
+    then true
+    else List.exists (kaksno_negativno2) forest
 
 (* 2.4) Sestavite funkcijo, ki sprejme naravno število ter sestavi (poljubno)
    drevo, ki ima toliko otrok.
