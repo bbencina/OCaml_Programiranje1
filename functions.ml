@@ -29,7 +29,7 @@ let rec repeat x n =
  - : int list = [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10]
  ---------- *)
 
-let rec range_not_tail n = 
+let rec range_not_tail n =
 	match n with
 	| (-1) -> []
 	| n -> if n < 0 then [] else (range_not_tail (n-1))@[n]
@@ -61,7 +61,7 @@ let rec map f l =
  - : int list = [2; 3; 4; 5; 6]
  ---------- *)
 
-let map_tlrec f l = 
+let map_tlrec f l =
 	let rec mapping l acc =
 		match l with
 		| [] -> reverse acc
@@ -81,7 +81,7 @@ let mapi f l =
 		| [] -> reverse acc
 		| hd::tl -> mapping tl ((f i hd)::acc) (i+1)
 	in mapping l [] 0
-	
+
 
 (* The function "zip l1 l2" accepts lists l1 = [l1_0; l1_1; l1_2; ...] and
  l2 = [l2_0; l2_1; l2_2; ...] and returns the list [(l1_0,l2_0); (l1_1,l2_1); ...].
@@ -102,7 +102,7 @@ let zip l1 l2 =
 		| (hd1::tl1, hd2::tl2) -> zipping tl1 tl2 ((hd1, hd2)::acc)
 	in zipping l1 l2 []
 
-(* The function "zip_enum_tlrec l1 l2" accepts lists l1 = [l1_0; l1_1; l1_2; ...] 
+(* The function "zip_enum_tlrec l1 l2" accepts lists l1 = [l1_0; l1_1; l1_2; ...]
  and l2 = [l2_0; l2_1; l2_2; ...] and returns [(0, l1_0, l2_0); (1, l1_1, l2_1); ...].
  The function is tail recursive..
  If the lenght of lists l1 and l2 doesn't match it fails.
@@ -136,7 +136,7 @@ let unzip l = ()
  ---------- *)
 
 let unzip_tlrec l =
-	let rec unzipping l acc = 
+	let rec unzipping l acc =
 		match l with
 		| [] -> (reverse (snd acc), reverse (fst acc))
 		| hd::tl -> unzipping tl ((fst hd)::(fst acc), (snd hd)::(snd acc))
@@ -150,9 +150,13 @@ let unzip_tlrec l =
  - : string = "FICUS"
  ---------- *)
 
-let fold_left_no_acc f l = ()
+let fold_left_no_acc f l =
+	match l with
+	| [] -> failwith "Empty."
+	| l0 :: [] -> failwith "Less than 2 elements."
+	| l0 :: l1 :: tail -> List.fold_left f (f l0 l1) tail
 
-(* The function "apply_sequence f x n" returns the list of repeated applications 
+(* The function "apply_sequence f x n" returns the list of repeated applications
  of the function f on x, [x; f x; f (f x); ...; f applied n times on x].
  The function is tail recursive.
  ----------
@@ -162,16 +166,29 @@ let fold_left_no_acc f l = ()
  - : int list = []
  ---------- *)
 
-let apply_sequence f x n = ()
+let apply_sequence f x n =
+	let rec applying f x n acc =
+		if n < 0
+		then reverse acc
+		else applying f (f x) (n-1) (x :: acc)
+	in applying f x n []
 
-(* The function "filter f l" returns the list of elements for which 
+(* The function "filter f l" returns the list of elements for which
  (f x) equals true.
  ----------
  # filter ((<)3) [0; 1; 2; 3; 4; 5];;
  - : int list = [4; 5]
  ---------- *)
 
-let filter f l = ()
+let filter f l =
+	let rec filtering f l acc =
+		match l with
+		| [] -> reverse acc
+		| hd :: tl ->
+			if f hd
+			then filtering f tl (hd :: acc)
+			else filtering f tl acc
+	in filtering f l []
 
 (* The function "exists f l" checks if there exists an element of the list l
  for which the function f returns true, otherwise it returns false.
@@ -183,7 +200,13 @@ let filter f l = ()
  - : bool = false
  ---------- *)
 
-let exists f l = ()
+let rec exists f l =
+	match l with
+	| [] -> false
+	| hd :: tl ->
+		if f hd
+		then true
+		else exists f tl
 
 (* The function "first f none_value l" returns the first element of the list l
  for which f returns true. If such an element does not exist it returns none_value.
@@ -195,8 +218,14 @@ let exists f l = ()
  - : int = 0
  ---------- *)
 
-let first f none_value l = ()
-  
+let rec first f none_value l =
+	match l with
+	| [] -> none_value
+	| hd :: tl ->
+		if f hd
+		then hd
+		else first f none_value tl
+
 (* The northerners are attacking Middlebirch. As the archwizard you know the sequence
  of spells needed to protect Middlebirch. The sequence of spells is written as a list
  [("name1", value1); ("name2", value2); ...].
@@ -209,12 +238,12 @@ let first f none_value l = ()
  wizards able to protect Middlebirch on their own.
 
  The function "fails_on spells wizards" returns a list of pairs (wizard, failed spell),
- where the failed spell is the first spell in the sequence for which the wizard has 
- insufficient ability. The ability to cast all spells is represented as an empty string 
+ where the failed spell is the first spell in the sequence for which the wizard has
+ insufficient ability. The ability to cast all spells is represented as an empty string
  for the failed spell.
- 
+
  Hint: A good wizard uses his knowledge and experiences gained during his studies.
- 
+
  ----------
  # let spells = [("Protect",51); ("Renounce", 17); ("Blaze", 420); ("Banish",103)] in
    let wizards = [("Merlin", 1832); ("Frodo", 53); ("Atijam", 1337);
