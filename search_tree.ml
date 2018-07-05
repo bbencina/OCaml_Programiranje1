@@ -172,7 +172,7 @@ let rec insert x bst =
 		else if x < root
 		then Node(insert x t1, root, t2)
 		else Node(t1, root, insert x t2)
-	
+
 let rec member x bst =
 	match bst with
 	| Empty -> false
@@ -208,7 +208,7 @@ let bst_of_list l =
    - : string list = ["a"; "b"; "c"; "d"; "e"; "f"]
    ---------- *)
 
-let tree_sort l = ()
+let tree_sort l = l |> bst_of_list |> list_of_tree
 
 (* The function "succ bst" ['a tree -> 'a option] returns the succesor of the
    tree root, if it exists. For instance, for bst = Node(l, x, r) it returns
@@ -222,9 +222,29 @@ let tree_sort l = ()
    - : int option = None
    ---------- *)
 
-let succ bst = ()
+let succ bst =
+  match bst with
+  | Empty -> None
+  | Node (_, root, Empty) -> None
+  | Node (tl, root, Node (t1, rr, t2)) ->
+    let rec minning m t =
+      match t with
+      | Empty -> Some m
+      | Node (Empty, x, _) -> if x < m then Some x else Some m
+      | Node (t1, x, _) -> minning m t1
+    in minning rr t1
 
-let pred bst = ()
+let pred bst =
+  match bst with
+  | Empty -> None
+  | Node (Empty, root, _) -> None
+  | Node (Node (t1, rr, t2), root, tr) ->
+    let rec minning m t =
+      match t with
+      | Empty -> Some m
+      | Node (_, x, Empty) -> if x > m then Some x else Some m
+      | Node (_, x, t1) -> minning m t1
+    in minning rr t1
 
 (* In lectures you mentioned multiple different algorithms for deletion.
    One uses "succ" and the other "pred".
